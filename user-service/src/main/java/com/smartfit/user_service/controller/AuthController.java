@@ -26,9 +26,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User request) {
-        User user = userService.login(request.getUsername(), request.getPassword());
-        return JwtUtil.generateToken(user.getUsername());
+    public Object login(@RequestBody User request) {
+        try {
+            User user = userService.login(request.getUsername(), request.getPassword());
+
+            return java.util.Map.of(
+                "token", JwtUtil.generateToken(user.getUsername())
+            );
+
+        } catch (RuntimeException e) {
+            return java.util.Map.of(
+                "error", e.getMessage()
+            );
+        }
     }
 
 }
