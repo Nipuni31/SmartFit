@@ -1,18 +1,65 @@
 package com.smartfit.user_service.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 public class JwtUtil {
-    private static final String SECRET = "secret-key";
+    private static final String SECRET = "secret-key-smartfit-secure-key-2024-production";
+    private static final long EXPIRATION_TIME = 86400000; // 24 hours
+
+    private static final SecretKey SIGNING_KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+
+    public static String generateToken(Long userId, String username, String role) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("userId", userId)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SIGNING_KEY, SignatureAlgorithm.HS256)
+                .compact();
+    }
 
     public static String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SIGNING_KEY, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public static String extractUsername(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    public static Long extractUserId(String token) {
+        return getClaims(token).get("userId", Long.class);
+    }
+
+    public static String extractRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    public static Boolean validateToken(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(SIGNING_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
