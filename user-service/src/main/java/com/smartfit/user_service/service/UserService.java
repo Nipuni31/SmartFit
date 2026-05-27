@@ -60,17 +60,17 @@ public class UserService {
         return user;
     }
 
-    public User getUserById(Long id) {
+    public User getUserById(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public UserResponse getUserProfile(Long id) {
+    public UserResponse getUserProfile(String id) {
         User user = getUserById(id);
         return convertToUserResponse(user);
     }
 
-    public User updateUserProfile(Long id, UserResponse request) {
+    public User updateUserProfile(String id, UserResponse request) {
         User user = getUserById(id);
         
         if (request.getName() != null) user.setName(request.getName());
@@ -103,13 +103,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public User deactivateUser(Long id) {
+    public User deactivateUser(String id) {
         User user = getUserById(id);
         user.setActive(false);
         return userRepository.save(user);
     }
 
-    public User activateUser(Long id) {
+    public User activateUser(String id) {
         User user = getUserById(id);
         user.setActive(true);
         return userRepository.save(user);

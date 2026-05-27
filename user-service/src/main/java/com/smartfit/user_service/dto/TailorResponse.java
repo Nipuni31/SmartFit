@@ -2,7 +2,7 @@ package com.smartfit.user_service.dto;
 
 import com.smartfit.user_service.entity.Role;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TailorResponse {
-    private Long id;
+    private String id;
     private String username;
     private String email;
     private String name;
@@ -18,5 +18,5 @@ public class TailorResponse {
     private String shopName;
     private String shopAddress;
     private String specialization;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

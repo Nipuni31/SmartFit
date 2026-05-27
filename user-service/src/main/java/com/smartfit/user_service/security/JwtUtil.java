@@ -14,7 +14,8 @@ public class JwtUtil {
 
     private static final SecretKey SIGNING_KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
-    public static String generateToken(Long userId, String username, String role) {
+    // userId stored as String (MongoDB ObjectId or generated String)
+    public static String generateToken(String userId, String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("userId", userId)
@@ -38,8 +39,8 @@ public class JwtUtil {
         return getClaims(token).getSubject();
     }
 
-    public static Long extractUserId(String token) {
-        return getClaims(token).get("userId", Long.class);
+    public static String extractUserId(String token) {
+        return getClaims(token).get("userId", String.class);
     }
 
     public static String extractRole(String token) {

@@ -16,7 +16,7 @@ public class BuyerController {
     @GetMapping("/profile")
     public UserResponse getProfile(Principal principal) {
         try {
-            Long userId = Long.parseLong(principal.getName());
+            String userId = principal.getName();
             return userService.getUserProfile(userId);
         } catch (Exception e) {
             throw new RuntimeException("Unable to retrieve profile");
@@ -28,7 +28,7 @@ public class BuyerController {
             Principal principal,
             @RequestBody UserResponse request) {
         try {
-            Long userId = Long.parseLong(principal.getName());
+            String userId = principal.getName();
             userService.updateUserProfile(userId, request);
             return java.util.Map.of("message", "Profile updated successfully");
         } catch (Exception e) {

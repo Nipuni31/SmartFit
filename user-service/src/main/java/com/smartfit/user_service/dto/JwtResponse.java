@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class JwtResponse {
     private String token;
-    private Long userId;
+    private String userId;
     private String username;
     private String email;
     private Role role;
