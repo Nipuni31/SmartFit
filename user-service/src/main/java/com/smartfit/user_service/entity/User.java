@@ -1,12 +1,15 @@
 package com.smartfit.user_service.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import lombok.*;
 import java.util.List;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
-@Entity
-@Table(name = "users")
+@Document(collection = "users")
 @Getter
 @Setter
 @Builder
@@ -14,52 +17,37 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(unique = true)
+    @Indexed(unique = true)
     private String username;
-    
-    @Column(unique = true)
+
+    @Indexed(unique = true)
     private String email;
-    
+
     private String password;
     private String name;
     private String gender;
     private Float height; // in cm
     private Float weight; // in kg
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+
     private Role role;
-    
+
     // For Tailor specific info
     private String shopName;
     private String shopAddress;
     private String specialization; // e.g., formal wear, casual wear, traditional
-    
+
     // User activity tracking
-    @ElementCollection
     private List<String> uploadedImages; // store image paths
-    
-    @ElementCollection
     private List<String> savedPredictions; // store prediction results
-    
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Boolean active;
-    
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-        if (active == null) {
-            active = true;
-        }
-    }
-    
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+
+    @CreatedDate
+    private Instant createdAt;
+
+    @LastModifiedDate
+    private Instant updatedAt;
+
+    private Boolean active = true;
+
 }

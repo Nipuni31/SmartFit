@@ -20,7 +20,7 @@ public class TailorController {
     @GetMapping("/profile")
     public Object getProfile(Principal principal) {
         try {
-            Long tailorId = Long.parseLong(principal.getName());
+            String tailorId = principal.getName();
             User tailor = tailorService.getTailorProfile(tailorId);
             return convertToTailorResponse(tailor);
         } catch (Exception e) {
@@ -33,7 +33,7 @@ public class TailorController {
             Principal principal,
             @RequestBody TailorResponse request) {
         try {
-            Long tailorId = Long.parseLong(principal.getName());
+            String tailorId = principal.getName();
             User tailor = tailorService.updateTailorProfile(
                     tailorId,
                     request.getShopName(),
@@ -57,7 +57,7 @@ public class TailorController {
 
     @GetMapping("/customer/{customerId}/measurements")
     public Object viewCustomerMeasurements(
-            @PathVariable Long customerId,
+            @PathVariable String customerId,
             Principal principal) {
         try {
             User customer = tailorService.viewCustomerMeasurements(customerId);
@@ -75,7 +75,7 @@ public class TailorController {
 
     @PostMapping("/recommend/{customerId}")
     public Object recommendClothing(
-            @PathVariable Long customerId,
+            @PathVariable String customerId,
             @RequestBody java.util.Map<String, String> request,
             Principal principal) {
         try {
@@ -92,8 +92,8 @@ public class TailorController {
             @RequestBody java.util.Map<String, Object> request,
             Principal principal) {
         try {
-            Long tailorId = Long.parseLong(principal.getName());
-            Long customerId = ((Number) request.get("customerId")).longValue();
+            String tailorId = principal.getName();
+            String customerId = request.get("customerId").toString();
             String orderDetails = (String) request.get("orderDetails");
             
             tailorService.createOrder(tailorId, customerId, orderDetails);

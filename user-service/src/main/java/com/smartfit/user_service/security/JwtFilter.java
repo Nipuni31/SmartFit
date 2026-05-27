@@ -23,9 +23,9 @@ public class JwtFilter extends OncePerRequestFilter {
         if (token != null && JwtUtil.validateToken(token)) {
             String username = JwtUtil.extractUsername(token);
             String role = JwtUtil.extractRole(token);
-            Long userId = JwtUtil.extractUserId(token);
+            String userId = JwtUtil.extractUserId(token);
             
-            // Use the user ID as the principal so controllers can parse it consistently.
+            // Use the user ID (String) as the principal so controllers can read it directly.
             SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
             UsernamePasswordAuthenticationToken authToken = 
                     new UsernamePasswordAuthenticationToken(userId, null, Collections.singletonList(authority));

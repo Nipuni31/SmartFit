@@ -14,7 +14,7 @@ public class TailorService {
 
     private final UserRepository userRepository;
 
-    public User getTailorProfile(Long tailorId) {
+    public User getTailorProfile(String tailorId) {
         User tailor = userRepository.findById(tailorId)
                 .orElseThrow(() -> new RuntimeException("Tailor not found"));
         
@@ -25,7 +25,7 @@ public class TailorService {
         return tailor;
     }
 
-    public User updateTailorProfile(Long tailorId, String shopName, String shopAddress, String specialization) {
+    public User updateTailorProfile(String tailorId, String shopName, String shopAddress, String specialization) {
         User tailor = getTailorProfile(tailorId);
         
         if (shopName != null) tailor.setShopName(shopName);
@@ -47,7 +47,7 @@ public class TailorService {
     }
 
     // View customer measurements
-    public User viewCustomerMeasurements(Long customerId) {
+    public User viewCustomerMeasurements(String customerId) {
         User customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         
@@ -59,13 +59,13 @@ public class TailorService {
     }
 
     // Store measurement recommendations
-    public void addMeasurementRecommendation(Long customerId, String recommendation) {
+    public void addMeasurementRecommendation(String customerId, String recommendation) {
         // This would be extended with a separate recommendations table
         // For now, it's a placeholder
     }
 
     // Store tailor's order information
-    public void createOrder(Long tailorId, Long customerId, String orderDetails) {
+    public void createOrder(String tailorId, String customerId, String orderDetails) {
         // This would be extended with a separate orders table
         // For now, it's a placeholder
     }

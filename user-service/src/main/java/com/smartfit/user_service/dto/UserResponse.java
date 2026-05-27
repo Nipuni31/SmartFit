@@ -2,7 +2,7 @@ package com.smartfit.user_service.dto;
 
 import com.smartfit.user_service.entity.Role;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponse {
-    private Long id;
+    private String id;
     private String username;
     private String email;
     private String name;
@@ -19,6 +19,6 @@ public class UserResponse {
     private Float height;
     private Float weight;
     private Role role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

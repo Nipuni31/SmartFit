@@ -45,7 +45,7 @@ public class AdminController {
     }
 
     @GetMapping("/user/{userId}")
-    public Object getUserDetails(@PathVariable Long userId) {
+    public Object getUserDetails(@PathVariable String userId) {
         try {
             UserResponse user = userService.getUserProfile(userId);
             return user;
@@ -55,7 +55,7 @@ public class AdminController {
     }
 
     @PostMapping("/user/{userId}/deactivate")
-    public Object deactivateUser(@PathVariable Long userId) {
+    public Object deactivateUser(@PathVariable String userId) {
         try {
             userService.deactivateUser(userId);
             return java.util.Map.of("message", "User deactivated successfully");
@@ -65,7 +65,7 @@ public class AdminController {
     }
 
     @PostMapping("/user/{userId}/activate")
-    public Object activateUser(@PathVariable Long userId) {
+    public Object activateUser(@PathVariable String userId) {
         try {
             userService.activateUser(userId);
             return java.util.Map.of("message", "User activated successfully");
