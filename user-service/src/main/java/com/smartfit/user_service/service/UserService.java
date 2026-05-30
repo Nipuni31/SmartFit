@@ -1,10 +1,12 @@
 package com.smartfit.user_service.service;
 
+import com.smartfit.user_service.entity.TailorProfile;
 import com.smartfit.user_service.entity.User;
 import com.smartfit.user_service.entity.Role;
 import com.smartfit.user_service.dto.RegisterRequest;
 import com.smartfit.user_service.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
+import com.smartfit.user_service.repository.TailorProfileRepository;
 import com.smartfit.user_service.repository.UserRepository;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TailorProfileRepository tailorProfileRepository;
     private final BCryptPasswordEncoder encoder;
 
     public User register(RegisterRequest request) {
@@ -28,12 +31,17 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
 
+        Role role = request.getRole() != null ? request.getRole() : Role.BUYER;
+        if (role == Role.ADMIN) {
+            throw new RuntimeException("Cannot register as ADMIN");
+        }
+
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(encoder.encode(request.getPassword()))
                 .name(request.getName())
-                .role(request.getRole() != null ? request.getRole() : Role.BUYER)
+                .role(role)
                 .gender(request.getGender())
                 .height(request.getHeight())
                 .weight(request.getWeight())
@@ -42,7 +50,20 @@ public class UserService {
                 .specialization(request.getSpecialization())
                 .build();
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        if (role == Role.TAILOR) {
+            TailorProfile profile = TailorProfile.builder()
+                    .userId(savedUser.getId())
+                    .shopName(request.getShopName())
+                    .address(request.getShopAddress())
+                    .phone(request.getPhone())
+                    .description(request.getDescription())
+                    .build();
+            tailorProfileRepository.save(profile);
+        }
+
+        return savedUser;
     }
 
     public User login(String username, String password) {
