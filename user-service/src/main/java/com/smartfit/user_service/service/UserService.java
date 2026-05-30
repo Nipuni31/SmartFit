@@ -1,14 +1,20 @@
 package com.smartfit.user_service.service;
 
+import com.smartfit.user_service.entity.TailorProfile;
 import com.smartfit.user_service.entity.User;
 import com.smartfit.user_service.entity.Role;
+import com.smartfit.user_service.dto.PredictionRequest;
 import com.smartfit.user_service.dto.RegisterRequest;
 import com.smartfit.user_service.dto.UserResponse;
+import com.smartfit.user_service.entity.Prediction;
 import lombok.RequiredArgsConstructor;
+import com.smartfit.user_service.repository.PredictionRepository;
+import com.smartfit.user_service.repository.TailorProfileRepository;
 import com.smartfit.user_service.repository.UserRepository;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +23,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TailorProfileRepository tailorProfileRepository;
+    private final PredictionRepository predictionRepository;
     private final BCryptPasswordEncoder encoder;
 
     public User register(RegisterRequest request) {
@@ -28,12 +36,17 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
 
+        Role role = request.getRole() != null ? request.getRole() : Role.BUYER;
+        if (role == Role.ADMIN) {
+            throw new RuntimeException("Cannot register as ADMIN");
+        }
+
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(encoder.encode(request.getPassword()))
                 .name(request.getName())
-                .role(request.getRole() != null ? request.getRole() : Role.BUYER)
+                .role(role)
                 .gender(request.getGender())
                 .height(request.getHeight())
                 .weight(request.getWeight())
@@ -42,7 +55,20 @@ public class UserService {
                 .specialization(request.getSpecialization())
                 .build();
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        if (role == Role.TAILOR) {
+            TailorProfile profile = TailorProfile.builder()
+                    .userId(savedUser.getId())
+                    .shopName(request.getShopName())
+                    .address(request.getShopAddress())
+                    .phone(request.getPhone())
+                    .description(request.getDescription())
+                    .build();
+            tailorProfileRepository.save(profile);
+        }
+
+        return savedUser;
     }
 
     public User login(String username, String password) {
@@ -79,6 +105,22 @@ public class UserService {
         if (request.getWeight() != null) user.setWeight(request.getWeight());
 
         return userRepository.save(user);
+    }
+
+    public Prediction savePrediction(String userId, PredictionRequest request) {
+        Prediction prediction = Prediction.builder()
+                .userId(userId)
+                .topSize(request.getTopSize())
+                .bottomSize(request.getBottomSize())
+                .fit(request.getFit())
+                .confidence(request.getConfidence())
+                .createdAt(Instant.now())
+                .build();
+        return predictionRepository.save(prediction);
+    }
+
+    public List<Prediction> getPredictionsForUser(String userId) {
+        return predictionRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     public List<User> getUsersByRole(Role role) {

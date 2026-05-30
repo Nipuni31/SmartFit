@@ -17,6 +17,8 @@ public class RegisterRequest {
     private String gender;
     private Float height;
     private Float weight;
+    private String phone;
+    private String description;
     // Tailor specific fields
     private String shopName;
     private String shopAddress;

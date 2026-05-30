@@ -1,0 +1,5 @@
+D:\micro- advisor\api-gateway\src\main\java\com\smartfit\apigateway\ApiGatewayApplication.java
+D:\micro- advisor\api-gateway\src\main\java\com\smartfit\apigateway\GatewayController.java
+D:\micro- advisor\api-gateway\src\main\java\com\smartfit\apigateway\security\JwtFilter.java
+D:\micro- advisor\api-gateway\src\main\java\com\smartfit\apigateway\security\JwtUtil.java
+D:\micro- advisor\api-gateway\src\main\java\com\smartfit\apigateway\security\SecurityConfig.java

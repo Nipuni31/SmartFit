@@ -38,10 +38,6 @@ public class User {
     private String shopAddress;
     private String specialization; // e.g., formal wear, casual wear, traditional
 
-    // User activity tracking
-    private List<String> uploadedImages; // store image paths
-    private List<String> savedPredictions; // store prediction results
-
     @CreatedDate
     private Instant createdAt;
 
