@@ -83,6 +83,15 @@ public class GatewayController {
                 .bodyToMono(String.class);
     }
 
+    @GetMapping("/buyer/predictions")
+    public Mono<String> buyerPredictions(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        return userClient.get()
+                .uri("/buyer/predictions")
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
     @PutMapping(value = "/buyer/profile", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> updateBuyerProfile(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
@@ -178,6 +187,45 @@ public class GatewayController {
                 .bodyToMono(String.class);
     }
 
+    @PostMapping(value = "/tailor/customer/{customerId}/measurements", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<String> addCustomerMeasurement(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @PathVariable String customerId,
+            @RequestBody Map<String, Object> body
+    ) {
+        return userClient.post()
+                .uri(uriBuilder -> uriBuilder.path("/tailor/customer/{customerId}/measurements").build(customerId))
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    @GetMapping("/tailor/customer/{customerId}/history")
+    public Mono<String> customerHistory(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @PathVariable String customerId
+    ) {
+        return userClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/tailor/customer/{customerId}/history").build(customerId))
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    @GetMapping("/tailor/customer/{customerId}/predictions")
+    public Mono<String> customerPredictions(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @PathVariable String customerId
+    ) {
+        return userClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/tailor/customer/{customerId}/predictions").build(customerId))
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
     @PostMapping(value = "/tailor/recommend/{customerId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> recommendCustomer(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
@@ -200,6 +248,30 @@ public class GatewayController {
     ) {
         return userClient.post()
                 .uri("/tailor/order/create")
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    @GetMapping("/tailor/orders")
+    public Mono<String> tailorOrders(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        return userClient.get()
+                .uri("/tailor/orders")
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    @PostMapping(value = "/tailor/order/{orderId}/status", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<String> updateTailorOrderStatus(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @PathVariable String orderId,
+            @RequestBody Map<String, Object> body
+    ) {
+        return userClient.post()
+                .uri(uriBuilder -> uriBuilder.path("/tailor/order/{orderId}/status").build(orderId))
                 .header(HttpHeaders.AUTHORIZATION, authorization)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)

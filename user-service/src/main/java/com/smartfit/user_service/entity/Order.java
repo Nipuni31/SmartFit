@@ -18,6 +18,7 @@ public class Order {
     private String buyerId;
     private String tailorId;
     private String status;
+    private String details;
     @CreatedDate
     private Instant createdAt;
 }

@@ -1,7 +1,13 @@
 package com.smartfit.user_service.service;
 
+import com.smartfit.user_service.dto.ManualMeasurementRequest;
+import com.smartfit.user_service.entity.Measurement;
+import com.smartfit.user_service.entity.Order;
 import com.smartfit.user_service.entity.User;
 import com.smartfit.user_service.entity.Role;
+import com.smartfit.user_service.repository.MeasurementRepository;
+import com.smartfit.user_service.repository.OrderRepository;
+import com.smartfit.user_service.repository.PredictionRepository;
 import com.smartfit.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +19,9 @@ import java.util.stream.Collectors;
 public class TailorService {
 
     private final UserRepository userRepository;
+    private final MeasurementRepository measurementRepository;
+    private final PredictionRepository predictionRepository;
+    private final OrderRepository orderRepository;
 
     public User getTailorProfile(String tailorId) {
         User tailor = userRepository.findById(tailorId)
@@ -64,9 +73,60 @@ public class TailorService {
         // For now, it's a placeholder
     }
 
-    // Store tailor's order information
+    public List<Measurement> getCustomerMeasurements(String customerId) {
+        return measurementRepository.findByUserIdOrderByCreatedAtDesc(customerId);
+    }
+
+    public Measurement addManualMeasurement(String customerId, ManualMeasurementRequest request) {
+        Measurement measurement = Measurement.builder()
+                .userId(customerId)
+                .height(request.getHeight())
+                .shoulder(request.getShoulder())
+                .waist(request.getWaist())
+                .hip(request.getHip())
+                .chestDepth(request.getChestDepth())
+                .hipDepth(request.getHipDepth())
+                .build();
+        return measurementRepository.save(measurement);
+    }
+
     public void createOrder(String tailorId, String customerId, String orderDetails) {
-        // This would be extended with a separate orders table
-        // For now, it's a placeholder
+        Order order = Order.builder()
+                .tailorId(tailorId)
+                .buyerId(customerId)
+                .details(orderDetails)
+                .status("Pending")
+                .build();
+        orderRepository.save(order);
+    }
+
+    public List<Order> getOrdersForTailor(String tailorId) {
+        return orderRepository.findByTailorIdOrderByCreatedAtDesc(tailorId);
+    }
+
+    public Order updateOrderStatus(String orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(status);
+        return orderRepository.save(order);
+    }
+
+    public java.util.Map<String, Object> getCustomerHistory(String customerId) {
+        User customer = viewCustomerMeasurements(customerId);
+        List<Measurement> measurements = getCustomerMeasurements(customerId);
+        List<com.smartfit.user_service.entity.Prediction> predictions = predictionRepository.findByUserIdOrderByCreatedAtDesc(customerId);
+        return java.util.Map.of(
+                "customerId", customer.getId(),
+                "name", customer.getName(),
+                "gender", customer.getGender(),
+                "height", customer.getHeight(),
+                "weight", customer.getWeight(),
+                "measurements", measurements,
+                "predictions", predictions
+        );
+    }
+
+    public List<com.smartfit.user_service.entity.Prediction> getCustomerPredictions(String customerId) {
+        return predictionRepository.findByUserIdOrderByCreatedAtDesc(customerId);
     }
 }

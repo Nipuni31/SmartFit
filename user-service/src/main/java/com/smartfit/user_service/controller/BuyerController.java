@@ -1,10 +1,14 @@
 package com.smartfit.user_service.controller;
 
 import org.springframework.web.bind.annotation.*;
+import com.smartfit.user_service.dto.PredictionRequest;
 import com.smartfit.user_service.dto.UserResponse;
+import com.smartfit.user_service.entity.Prediction;
 import com.smartfit.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import java.security.Principal;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/buyer")
@@ -39,9 +43,9 @@ public class BuyerController {
     @PostMapping("/upload-image")
     public Object uploadImage(
             Principal principal,
-            @RequestParam String imagePath) {
+            @RequestBody Map<String, Object> body) {
         try {
-            // Store image path in user's uploadedImages list
+            // Store image path or metadata in the user profile if desired
             return java.util.Map.of("message", "Image uploaded successfully");
         } catch (Exception e) {
             return java.util.Map.of("error", e.getMessage());
@@ -51,13 +55,18 @@ public class BuyerController {
     @PostMapping("/save-prediction")
     public Object savePrediction(
             Principal principal,
-            @RequestParam String predictionData) {
+            @RequestBody PredictionRequest request) {
         try {
-            // Store prediction result
+            userService.savePrediction(principal.getName(), request);
             return java.util.Map.of("message", "Prediction saved successfully");
         } catch (Exception e) {
             return java.util.Map.of("error", e.getMessage());
         }
+    }
+
+    @GetMapping("/predictions")
+    public List<Prediction> getPredictionHistory(Principal principal) {
+        return userService.getPredictionsForUser(principal.getName());
     }
 
     @GetMapping("/view-tailors")
